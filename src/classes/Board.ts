@@ -24,7 +24,6 @@ import King from "./figures/King.ts";
 import StatsInvoker from "./service/command/StatsInvoker.ts";
 import LoadStatsCommand from "./service/command/LoadStatsCommand.ts";
 
-
 interface BoardContextType {
     board: Board;
     getBoardCell: (row:number, col:number) => Cell;
@@ -66,10 +65,9 @@ class Board {
     goteKing: King | null = null;
     winsCounter: number = 0;
     losesCounter: number = 0;
-    isPlaying: boolean;
+    isPlaying: boolean = false; 
+    
     private _listeners: (() => void)[] = [];
-
-
 
     private constructor() {
         for (let i = 0; i < 9; i++) {
@@ -87,8 +85,6 @@ class Board {
         this.elephantMoveDisplay = new MoveDisplayStrategy(new ElephantMoveStrategy())
         this.rookMoveDisplay = new MoveDisplayStrategy(new RookMoveStrategy())
         this.mediator = new MoveMediator();
-
-
     }
 
     public static get instance(): Board {
@@ -112,22 +108,19 @@ class Board {
 
     public initiateGame() {
         this.resetGameState();
-        console.clear()
+        console.clear();
         console.log("Game Starting");
-        this.statsInvoker.setCommand(new LoadStatsCommand())
+        this.statsInvoker.setCommand(new LoadStatsCommand());
         this.statsInvoker.executeStorageOperation();
 
         this.isPlaying = true;
         this.kingInitiation(0, 4, true);
         this.kingInitiation(8, 4, false);
 
-
-
         this.goldenGeneralInitiation(0, 3, true);
         this.goldenGeneralInitiation(0, 5, true);
         this.goldenGeneralInitiation(8, 3, false);
         this.goldenGeneralInitiation(8, 5, false);
-
 
         this.silverGeneralInitiation(0, 2, true);
         this.silverGeneralInitiation(0, 6, true);
@@ -139,7 +132,6 @@ class Board {
         this.horseInitiation(8, 1, false);
         this.horseInitiation(8, 7, false);
 
-
         this.spearInitiation(0, 0, true);
         this.spearInitiation(0, 8, true);
         this.spearInitiation(8, 0, false);
@@ -150,7 +142,6 @@ class Board {
 
         this.rookInitiation(1, 1, true);
         this.rookInitiation(7, 7, false);
-
 
         for (let i=0; i < 9; i++) {
             this.pawnInitiation(2, i, true);
@@ -235,7 +226,6 @@ class Board {
         this.displayFigureOrder(pawnCell, pawn, rotated);
     }
 
-
     public getCell(row:number, col:number): Cell {
         return this.coordinates[row][col];
     }
@@ -264,7 +254,10 @@ class Board {
         this.figureToDrop?.setCol(cell.coords.column)
         const figureToMove = this.selectedCell?.figureOn ? this.selectedCell?.figureOn : this.figureToDrop;
 
-        figureToMove?.requestForMove(cell);
+        if (figureToMove) {
+            figureToMove.requestForMove(cell);
+        }
+        
         this.clearCapturesDisplay()
 
         const previousMove = this.currentTurn;
@@ -274,15 +267,15 @@ class Board {
             if (previousMove == "sente") {
                 this.senteCapturedFigures = this.senteCapturedFigures.filter((item) => {
                     return !((item.constructor.name === this.figureToDrop?.constructor.name) &&
-                      (item.getRow() === this.figureToDrop.getRow()) &&
-                      (item.getCol() === this.figureToDrop.getCol()))
+                      (item.getRow() === this.figureToDrop?.getRow()) &&
+                      (item.getCol() === this.figureToDrop?.getCol()))
                 })
             }
             else {
                 this.goteCapturedFigures = this.goteCapturedFigures.filter((item) => {
                     return !((item.constructor.name === this.figureToDrop?.constructor.name) &&
-                      (item.getRow() === this.figureToDrop.getRow()) &&
-                      (item.getCol() === this.figureToDrop.getCol()))
+                      (item.getRow() === this.figureToDrop?.getRow()) &&
+                      (item.getCol() === this.figureToDrop?.getCol()))
                 })
             }
 
@@ -290,8 +283,6 @@ class Board {
                 figureToMove.isCaptured = false;
             }
             this.figureToDrop = null;
-
-
         }
         this._notifyListeners();
     }
@@ -309,7 +300,7 @@ class Board {
     }
 
     resetGameState(): void {
-        this.clearBoard(); // clears the cells
+        this.clearBoard();
         this.selectedCell = null;
         this.cellsToMoveDisplay = [];
         this.figureToDrop = null;
@@ -321,7 +312,6 @@ class Board {
         this.isPlaying = true;
         this._notifyListeners();
     }
-
 }
 
 export { Board, BoardContext};

@@ -4,6 +4,7 @@ import {Board} from "./Board.ts";
 import FigureState from "./service/state/FigureState.ts";
 
 abstract class Figure {
+    public abstract readonly figureName: string;
     protected mediator: Mediator;
     protected figureCoordinates: {row: number, col: number};
     private state: FigureState;
@@ -82,7 +83,9 @@ abstract class Figure {
     }
 
 
-
+    public getFigureMediator(): Mediator {
+        return this.mediator;
+    }
 }
 
 export default Figure;

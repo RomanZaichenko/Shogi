@@ -140,7 +140,9 @@ class RookPromotionDecorator extends FigurePromotionDecorator {
     return cellsToCapture;
   }
 
-
+  public get figureName(): string {
+    return this.figure.figureName;
+  }
 }
 
 export default RookPromotionDecorator;

@@ -71,7 +71,7 @@ function ElephantElement({
         }}
       >
         <img
-          src={`src/images/figures/${elephantImage}`}
+          src={`/images/figures/${elephantImage}`}
           alt="Captured Elephant"
         />
       </div>
@@ -113,7 +113,7 @@ function ElephantElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${elephantImage}`} alt="Elephant" />
+        <img src={`/images/figures/${elephantImage}`} alt="Elephant" />
       </div>
     );
   }

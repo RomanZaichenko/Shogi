@@ -73,7 +73,7 @@ function KingElement({ row, col, isCaptured, setGameStage }: KingElementProps) {
         board.clearCapturesDisplay();
       }}
     >
-      <img src="src/images/figures/king.png" alt="King" />
+      <img src="/images/figures/king.png" alt="King" />
     </div>
   );
 }

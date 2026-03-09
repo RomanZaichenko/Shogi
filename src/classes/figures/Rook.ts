@@ -7,7 +7,7 @@ import PromotionState from "../service/state/PromotionState.ts";
 import RookPromotionDecorator from "../service/decorator/RookPromotionDecorator.ts";
 
 class Rook extends Figure{
-
+    public readonly figureName: string = "Rook";
     constructor(mediator: Mediator, row: number, col: number, state: FigureState) {
         super(mediator, row, col, state);
     }

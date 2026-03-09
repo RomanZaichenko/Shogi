@@ -147,6 +147,10 @@ class ElephantPromotionDecorator extends FigurePromotionDecorator {
 
     return cellsToCapture;
   }
+  
+  public get figureName(): string {
+    return this.figure.figureName;
+  }
 }
 
 export default ElephantPromotionDecorator;

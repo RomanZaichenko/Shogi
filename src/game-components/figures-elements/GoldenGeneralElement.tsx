@@ -62,7 +62,7 @@ function GoldenGeneralElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/golden_general.png`} alt="" />
+        <img src={`/images/figures/golden_general.png`} alt="" />
       </div>
     );
   } else {
@@ -96,7 +96,7 @@ function GoldenGeneralElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src="src/images/figures/golden_general.png" alt="" />
+        <img src="/images/figures/golden_general.png" alt="" />
       </div>
     );
   }

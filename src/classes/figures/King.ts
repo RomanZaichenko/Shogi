@@ -6,6 +6,7 @@ import FigureState from "../service/state/FigureState.ts";
 
 
 class King extends Figure {
+    public readonly figureName: string = "King";
     public isChecked: boolean = false;
     public isCaptured: boolean = false;
 

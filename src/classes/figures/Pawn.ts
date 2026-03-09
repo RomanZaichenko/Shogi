@@ -8,7 +8,7 @@ import GeneralPromotionDecorator from "../service/decorator/GeneralPromotionDeco
 
 
 class Pawn extends Figure{
-
+    public readonly figureName: string = "Pawn";
     constructor(mediator: Mediator, row: number, col: number, state: FigureState) {
         super(mediator, row, col, state);
     }

@@ -72,7 +72,7 @@ function SpearElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${spearImage}`} alt="Captured Spear" />
+        <img src={`/images/figures/${spearImage}`} alt="Captured Spear" />
       </div>
     );
   } else {
@@ -110,7 +110,7 @@ function SpearElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${spearImage}`} alt="Spear" />
+        <img src={`/images/figures/${spearImage}`} alt="Spear" />
       </div>
     );
   }

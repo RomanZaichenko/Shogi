@@ -73,7 +73,7 @@ function SilverGeneralElement({
         }}
       >
         <img
-          src={`src/images/figures/${silverGeneralImage}`}
+          src={`/images/figures/${silverGeneralImage}`}
           alt="Captured Silver General"
         />
       </div>
@@ -114,7 +114,7 @@ function SilverGeneralElement({
         }}
       >
         <img
-          src={`src/images/figures/${silverGeneralImage}`}
+          src={`/images/figures/${silverGeneralImage}`}
           alt="Silver General"
         />
       </div>

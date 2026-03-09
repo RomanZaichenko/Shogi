@@ -71,7 +71,7 @@ function HorseElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${horseImage}`} alt="" />
+        <img src={`/images/figures/${horseImage}`} alt="" />
       </div>
     );
   } else {
@@ -109,7 +109,7 @@ function HorseElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${horseImage}`} alt="" />
+        <img src={`/images/figures/${horseImage}`} alt="" />
       </div>
     );
   }

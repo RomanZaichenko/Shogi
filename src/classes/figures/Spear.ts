@@ -8,7 +8,7 @@ import GeneralPromotionDecorator from "../service/decorator/GeneralPromotionDeco
 
 
 class Spear extends Figure{
-
+    public readonly figureName: string = "Spear";
     constructor(mediator: Mediator, row: number, col: number, state: FigureState) {
         super(mediator, row, col, state);
     }

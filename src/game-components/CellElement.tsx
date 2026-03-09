@@ -1,6 +1,6 @@
 import "../styles/CellElement.css";
 import { Board, useBoard } from "../classes/Board.ts";
-import React, { useState, useEffect, useRef, createContext } from "react"; // Видалено useContext
+import React, { useState, useEffect, useRef, createContext } from "react";
 import KingElement from "./figures-elements/KingElement.tsx";
 import PawnElement from "./figures-elements/PawnElement.tsx";
 import GoldenGeneralElement from "./figures-elements/GoldenGeneralElement.tsx";
@@ -11,7 +11,6 @@ import ElephantElement from "./figures-elements/ElephantElement.tsx";
 import RookElement from "./figures-elements/RookElement.tsx";
 import ClickImplementation from "../classes/service/bridge/ClickImplementation.ts";
 import DragImplementation from "../classes/service/bridge/DragImplementation.ts";
-import GeneralPromotionDecorator from "../classes/service/decorator/GeneralPromotionDecorator.ts";
 import DefaultState from "../classes/service/state/DefaultState.ts";
 
 interface CellElementProps {
@@ -58,41 +57,23 @@ function CellElement({ row, col }: CellElementProps) {
           board.mediator.setMoveImplementation(clickImplementation);
 
           if (cell.canCapture) {
-            if (board.currentTurn == "sente") {
-              const figure = cell.figureOn; // Змінено let на const
+            const capturedFigure = cell.figureOn;
+            if (capturedFigure) {
+              capturedFigure.setFigureState(new DefaultState());
+              capturedFigure.setRow(-1);
+              capturedFigure.setCol(-1);
+              capturedFigure.setCaptured();
 
-              figure?.setFigureState(new DefaultState());
-              figure?.setRow(-1);
-              figure?.setCol(-1);
-              figure?.setCaptured();
-
-              if (cell.isOccupied && figure) {
-                board.senteCapturedFigures.push(figure);
+              if (board.currentTurn === "sente") {
+                board.senteCapturedFigures.push(capturedFigure);
+              } else {
+                board.goteCapturedFigures.push(capturedFigure);
               }
-              console.log("Sente pushed");
-              console.log(board.senteCapturedFigures);
-            } else {
-              const figure = cell.figureOn;
-
-              figure?.setFigureState(new DefaultState());
-              figure?.setRow(-1);
-              figure?.setCol(-1);
-              figure?.setCaptured();
-
-              if (cell.isOccupied && figure) {
-                board.goteCapturedFigures.push(figure);
-              }
-              console.log("Gote pushed");
-              console.log(board.goteCapturedFigures);
             }
           }
 
           if (!cell.canCapture) {
-            if (board.currentTurn == "sente") {
-              cell.displayRotated = false;
-            } else {
-              cell.displayRotated = true;
-            }
+            cell.displayRotated = board.currentTurn !== "sente";
           }
 
           board.moveFigure(cell);
@@ -104,46 +85,31 @@ function CellElement({ row, col }: CellElementProps) {
   };
 
   const onFigureDrop = () => {
-    console.log(cell.canMoveTo);
     if (cell.canMoveTo) {
       const startingCell = board.selectedCell ? board.selectedCell : null;
-      if (startingCell || board.figureToDrop) {
-        const figureToDrop = startingCell?.figureOn || board.figureToDrop;
+      const figureToDrop = startingCell?.figureOn || board.figureToDrop;
 
-        if (figureToDrop) {
-          board.mediator.setMoveImplementation(dragImplementation);
+      if (figureToDrop) {
+        board.mediator.setMoveImplementation(dragImplementation);
 
-          if (cell.canCapture) {
-            if (board.currentTurn == "sente") {
-              const figure = cell.figureOn;
+        if (cell.canCapture) {
+          const capturedFigure = cell.figureOn;
+          if (capturedFigure) {
+            capturedFigure.setFigureState(new DefaultState());
+            capturedFigure.setRow(-1);
+            capturedFigure.setCol(-1);
+            capturedFigure.setCaptured();
 
-              figure?.setFigureState(new DefaultState());
-              figure?.setRow(-1);
-              figure?.setCol(-1);
-              figure?.setCaptured();
-              if (cell.isOccupied && figure) {
-                board.senteCapturedFigures.push(figure);
-              }
-              console.log("Sente pushed");
-              console.log(board.senteCapturedFigures);
+            if (board.currentTurn === "sente") {
+              board.senteCapturedFigures.push(capturedFigure);
             } else {
-              const figure = cell.figureOn;
-
-              figure?.setFigureState(new DefaultState());
-              figure?.setRow(-1);
-              figure?.setCol(-1);
-              figure?.setCaptured();
-              if (cell.isOccupied && figure) {
-                board.goteCapturedFigures.push(figure);
-              }
-              console.log("Just pushed");
-              console.log(board.goteCapturedFigures);
+              board.goteCapturedFigures.push(capturedFigure);
             }
           }
-          board.moveFigure(cell);
-          board.clearMoves();
-          board.selectedCell = null;
         }
+        board.moveFigure(cell);
+        board.clearMoves();
+        board.selectedCell = null;
       }
     } else {
       board.clearMoves();
@@ -151,51 +117,25 @@ function CellElement({ row, col }: CellElementProps) {
   };
 
   useEffect(() => {
-    const listener = () => {
-      setTick((prevTick) => prevTick + 1);
-    };
-
+    const listener = () => setTick((prev) => prev + 1);
     board.subscribe(listener);
-
-    return () => {
-      board.unsubscribe(listener);
-    };
-  }, [board, row, col]);
+    return () => board.unsubscribe(listener);
+  }, [board]);
 
   const figureOn = cell.figureOn;
 
   if (cell.isOccupied && figureOn) {
-    let name = figureOn.constructor.name;
-
-    if (figureOn.constructor.name === "GeneralPromotionDecorator") {
-      const decorateCell = figureOn as GeneralPromotionDecorator;
-
-      // @ts-expect-error: Доступ до захищеної властивості
-      const figureName = decorateCell.figure.constructor.name;
-
-      switch (figureName) {
-        case "Pawn":
-          name = "Pawn";
-          break;
-        case "Horse":
-          name = "Horse";
-          break;
-        case "SilverGeneral":
-          name = "SilverGeneral";
-          break;
-        case "Spear":
-          name = "Spear";
-          break;
-      }
-    } else if (figureOn.constructor.name === "ElephantPromotionDecorator") {
-      name = "Elephant";
-    } else if (figureOn.constructor.name === "RookPromotionDecorator") {
-      name = "Rook";
-    }
+    const name = figureOn.figureName;
 
     const FigureComponent = FigureComponents[
       name as keyof typeof FigureComponents
     ] as React.ElementType;
+
+    if (!FigureComponent) {
+      console.error(`Component for figure "${name}" not found!`);
+      return <div className="cell error-cell"></div>;
+    }
+
     figureElement = (
       <FigureComponent
         rotated={cell.displayRotated}
@@ -205,27 +145,14 @@ function CellElement({ row, col }: CellElementProps) {
       />
     );
 
-    if (cell.canCapture) {
-      return (
-        <CanMoveToContext.Provider value={cell.canCapture}>
-          <div
-            className="cell-capture"
-            onClick={onCellClick}
-            onDrop={onFigureDrop}
-            onDragOver={(event) => event.preventDefault()}
-          >
-            <div
-              className={cell.displayRotated ? "figure-rotated" : "figure"}
-              ref={figureRef}
-            >
-              {figureElement}
-            </div>
-          </div>
-        </CanMoveToContext.Provider>
-      );
-    } else {
-      return (
-        <div className="cell" onClick={onCellClick} onDrop={onFigureDrop}>
+    return (
+      <CanMoveToContext.Provider value={cell.canCapture}>
+        <div
+          className={cell.canCapture ? "cell-capture" : "cell"}
+          onClick={onCellClick}
+          onDrop={onFigureDrop}
+          onDragOver={(e) => e.preventDefault()}
+        >
           <div
             className={cell.displayRotated ? "figure-rotated" : "figure"}
             ref={figureRef}
@@ -233,8 +160,8 @@ function CellElement({ row, col }: CellElementProps) {
             {figureElement}
           </div>
         </div>
-      );
-    }
+      </CanMoveToContext.Provider>
+    );
   } else if (cell.canMoveTo) {
     return (
       <CanMoveToContext.Provider value={cell.canMoveTo}>
@@ -242,9 +169,9 @@ function CellElement({ row, col }: CellElementProps) {
           className="cell"
           onClick={onCellClick}
           onDrop={onFigureDrop}
-          onDragOver={(event) => event.preventDefault()}
+          onDragOver={(e) => e.preventDefault()}
         >
-          <div className={"cell-dot"} ref={canMoveDot}></div>
+          <div className="cell-dot" ref={canMoveDot}></div>
         </div>
       </CanMoveToContext.Provider>
     );

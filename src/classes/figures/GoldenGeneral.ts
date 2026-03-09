@@ -6,6 +6,7 @@ import FigureState from "../service/state/FigureState.ts";
 
 
 class GoldenGeneral extends Figure {
+    public readonly figureName: string = "GoldenGeneral";
     constructor(mediator: Mediator, row: number, col: number, state: FigureState) {
         super(mediator, row, col, state);
     }

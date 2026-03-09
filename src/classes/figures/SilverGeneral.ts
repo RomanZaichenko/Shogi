@@ -7,7 +7,7 @@ import PromotionState from "../service/state/PromotionState.ts";
 import GeneralPromotionDecorator from "../service/decorator/GeneralPromotionDecorator.ts";
 
 class SilverGeneral extends Figure{
-
+    public readonly figureName: string = "SilverGeneral";
     constructor(mediator: Mediator, row: number, col: number, state: FigureState) {
         super(mediator, row, col, state);
     }

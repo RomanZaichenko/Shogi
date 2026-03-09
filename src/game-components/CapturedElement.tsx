@@ -43,7 +43,6 @@ function CapturedElement({
   if (name === "GeneralPromotionDecorator") {
     const decorateCell = figure as GeneralPromotionDecorator;
 
-    // @ts-expect-error: Навмисний доступ до protected властивості декоратора
     const figureName = decorateCell.figure.constructor.name;
 
     switch (figureName) {
@@ -97,8 +96,6 @@ function CapturedElement({
     figure = rookCreator.createFigure(mediator, row, col, new DefaultState());
   }
 
-  // Приводимо до React.ElementType, щоб TS дозволив передавати будь-які пропси,
-  // оскільки різні фігури мають різні інтерфейси пропсів
   const FigureComponent = FigureComponents[
     name as keyof typeof FigureComponents
   ] as React.ElementType;

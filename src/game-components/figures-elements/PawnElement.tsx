@@ -72,7 +72,7 @@ function PawnElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${pawnImage}`} alt="Captured Pawn" />
+        <img src={`/images/figures/${pawnImage}`} alt="Captured Pawn" />
       </div>
     );
   } else {
@@ -110,7 +110,7 @@ function PawnElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${pawnImage}`} alt="Pawn" />
+        <img src={`/images/figures/${pawnImage}`} alt="Pawn" />
       </div>
     );
   }

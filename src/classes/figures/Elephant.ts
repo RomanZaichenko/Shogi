@@ -8,7 +8,7 @@ import ElephantPromotionDecorator from "../service/decorator/ElephantPromotionDe
 
 
 class Elephant extends Figure {
-
+    public readonly figureName: string = "Elephant";
     constructor(mediator: Mediator, row: number, col: number, state: FigureState) {
         super(mediator, row, col, state);
     }

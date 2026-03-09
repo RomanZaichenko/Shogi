@@ -72,7 +72,7 @@ function RookElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${rookImage}`} alt="Captured Rook" />
+        <img src={`/images/figures/${rookImage}`} alt="Captured Rook" />
       </div>
     );
   } else {
@@ -110,7 +110,7 @@ function RookElement({
           board.clearCapturesDisplay();
         }}
       >
-        <img src={`src/images/figures/${rookImage}`} alt="Rook" />
+        <img src={`/images/figures/${rookImage}`} alt="Rook" />
       </div>
     );
   }

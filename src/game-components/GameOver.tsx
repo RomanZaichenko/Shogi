@@ -1,7 +1,6 @@
 import MenuButton from "./MenuButton.tsx";
-import '../styles/MainMenu.css'
-import {Board} from "../classes/Board.ts";
-
+import "../styles/MainMenu.css";
+import { Board } from "../classes/Board.ts";
 
 interface GameOverProps {
   setGameStage: (stage: "menu" | "game" | "gameOver") => void;
@@ -14,7 +13,10 @@ function GameOver({ setGameStage }: GameOverProps) {
     <main id="menu-visible">
       <h1 id="menu-title">Game Over</h1>
       <h2 id="menu-subtitle">{message}</h2>
-      <MenuButton buttonName={"Back To Menu"} clickHandler={() => setGameStage("menu")} />
+      <MenuButton
+        buttonName={"Back To Menu"}
+        clickHandler={() => setGameStage("menu")}
+      />
     </main>
   );
 }

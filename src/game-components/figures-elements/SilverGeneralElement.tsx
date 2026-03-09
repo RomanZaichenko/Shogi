@@ -1,5 +1,5 @@
-import {Board, useBoard} from "../../classes/Board.ts";
-import {useEffect, useState} from "react";
+import { Board, useBoard } from "../../classes/Board.ts";
+import { useEffect, useState } from "react";
 import Figure from "../../classes/Figure.ts";
 
 interface SilverGeneralElementProps {
@@ -10,11 +10,44 @@ interface SilverGeneralElementProps {
   owner: string;
 }
 
-function SilverGeneralElement({row, col, isCaptured, figure, owner}: SilverGeneralElementProps) {
-  const {getBoardCell, displayAvailableMoves, clearMoves} = useBoard();
+function SilverGeneralElement({
+  row,
+  col,
+  isCaptured,
+  figure,
+  owner,
+}: SilverGeneralElementProps) {
+  const { getBoardCell, displayAvailableMoves, clearMoves } = useBoard();
   const board = Board.instance;
-  let silverGeneralImage: string;
 
+  const [, setTick] = useState(0);
+  const [isPromoted, setIsPromoted] = useState(false);
+
+  const cell = isCaptured ? null : getBoardCell(row, col);
+
+  useEffect(() => {}, [cell]);
+
+  useEffect(() => {
+    if (isCaptured) return;
+
+    const listener = () => {
+      setTick((prevTick) => prevTick + 1);
+    };
+
+    board.subscribe(listener);
+
+    return () => {
+      board.unsubscribe(listener);
+    };
+  }, [board, isCaptured]);
+
+  useEffect(() => {
+    if (cell && cell.figureOn?.getState().checkPromotion() != undefined) {
+      setIsPromoted(!!cell.figureOn?.getState().checkPromotion());
+    }
+  }, [cell]);
+
+  let silverGeneralImage: string;
 
   if (isCaptured) {
     silverGeneralImage = "silver_general.png";
@@ -22,84 +55,70 @@ function SilverGeneralElement({row, col, isCaptured, figure, owner}: SilverGener
       if (owner == board.currentTurn) {
         board.selectCapturedFigure(figure);
         board.silverGeneralMoveDisplay.displayDropIn(figure);
-        const movesToDisplay = board.cellsToMoveDisplay; //change
+        const movesToDisplay = board.cellsToMoveDisplay;
         displayAvailableMoves(movesToDisplay);
       }
-    }
-    return (<div className="figure" onClick={onSilverGeneralClick}
-                 draggable
-                 onDragStart={onSilverGeneralClick}
-                 onDragEnd={() => {
-                   board.selectedCell = null;
-                   clearMoves();
-                   board.clearCapturesDisplay();
-                 }}>
+    };
 
-      <img src={`src/images/figures/${silverGeneralImage}`} alt=""/>
-    </div>)
-  }
-  else {
-    const cell = getBoardCell(row, col);
-    const [tick, setTick] = useState(0);
-
+    return (
+      <div
+        className="figure"
+        onClick={onSilverGeneralClick}
+        draggable
+        onDragStart={onSilverGeneralClick}
+        onDragEnd={() => {
+          board.selectedCell = null;
+          clearMoves();
+          board.clearCapturesDisplay();
+        }}
+      >
+        <img
+          src={`src/images/figures/${silverGeneralImage}`}
+          alt="Captured Silver General"
+        />
+      </div>
+    );
+  } else {
     const onSilverGeneralClick = () => {
-      if ((board.currentTurn == "sente" && !cell.displayRotated) ||
-        (board.currentTurn == "gote" && cell.displayRotated)) {
+      if (!cell) return;
 
-        if(!cell.canCapture){
-
+      if (
+        (board.currentTurn == "sente" && !cell.displayRotated) ||
+        (board.currentTurn == "gote" && cell.displayRotated)
+      ) {
+        if (!cell.canCapture) {
           board.selectedCell = cell;
           board.silverGeneralMoveDisplay.displayMoves(cell);
           const movesToDisplay = board.cellsToMoveDisplay;
-
           displayAvailableMoves(movesToDisplay);
         }
       }
-    }
-
-    useEffect(() => {
-
-    }, [cell]);
-
-    useEffect(() => {
-      const listener = () => {
-        setTick(prevTick => prevTick+1);
-      };
-
-      board.subscribe(listener);
-
-      return () => {
-        board.unsubscribe(listener);
-      }
-    }, [board]);
-
-    const [isPromoted, setIsPromoted] = useState(false);
-
-    useEffect(() => {
-      if (cell.figureOn?.getState().checkPromotion() != undefined) {
-        setIsPromoted(cell.figureOn?.getState().checkPromotion())
-      }
-    }, [isPromoted]);
-
+    };
 
     if (isPromoted) {
       silverGeneralImage = "silver_general-promotion.png";
-    }
-    else {
+    } else {
       silverGeneralImage = "silver_general.png";
     }
+
     return (
-      <div className="figure" onClick={onSilverGeneralClick}
-           draggable
-           onDragStart={onSilverGeneralClick}
-           onDragEnd={() => {
-             board.selectedCell = null;
-             clearMoves();
-             board.clearCapturesDisplay();
-           }}>
-        <img src={`src/images/figures/${silverGeneralImage}`} alt=""/>
+      <div
+        className="figure"
+        onClick={onSilverGeneralClick}
+        draggable
+        onDragStart={onSilverGeneralClick}
+        onDragEnd={() => {
+          board.selectedCell = null;
+          clearMoves();
+          board.clearCapturesDisplay();
+        }}
+      >
+        <img
+          src={`src/images/figures/${silverGeneralImage}`}
+          alt="Silver General"
+        />
       </div>
-    )
+    );
   }
 }
 

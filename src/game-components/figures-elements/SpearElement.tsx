@@ -1,5 +1,5 @@
-import {Board, useBoard} from "../../classes/Board.ts";
-import {useEffect, useState} from "react";
+import { Board, useBoard } from "../../classes/Board.ts";
+import { useEffect, useState } from "react";
 import Figure from "../../classes/Figure.ts";
 
 interface SpearElementProps {
@@ -10,9 +10,43 @@ interface SpearElementProps {
   owner: string;
 }
 
-function SpearElement({row, col, isCaptured, figure, owner}: SpearElementProps) {
-  const {getBoardCell, displayAvailableMoves, clearMoves} = useBoard();
+function SpearElement({
+  row,
+  col,
+  isCaptured,
+  figure,
+  owner,
+}: SpearElementProps) {
+  const { getBoardCell, displayAvailableMoves, clearMoves } = useBoard();
   const board = Board.instance;
+
+  const [, setTick] = useState(0);
+  const [isPromoted, setIsPromoted] = useState(false);
+
+  const cell = isCaptured ? null : getBoardCell(row, col);
+
+  useEffect(() => {}, [cell]);
+
+  useEffect(() => {
+    if (isCaptured) return;
+
+    const listener = () => {
+      setTick((prevTick) => prevTick + 1);
+    };
+
+    board.subscribe(listener);
+
+    return () => {
+      board.unsubscribe(listener);
+    };
+  }, [board, isCaptured]);
+
+  useEffect(() => {
+    if (cell && cell.figureOn?.getState().checkPromotion() != undefined) {
+      setIsPromoted(!!cell.figureOn?.getState().checkPromotion());
+    }
+  }, [cell]);
+
   let spearImage: string;
 
   if (isCaptured) {
@@ -21,83 +55,64 @@ function SpearElement({row, col, isCaptured, figure, owner}: SpearElementProps) 
       if (owner == board.currentTurn) {
         board.selectCapturedFigure(figure);
         board.spearMoveDisplay.displayDropIn(figure);
-        const movesToDisplay = board.cellsToMoveDisplay; //change
+        const movesToDisplay = board.cellsToMoveDisplay;
         displayAvailableMoves(movesToDisplay);
       }
-    }
-    return (<div className="figure" onClick={onSpearClick}
-                 draggable
-                 onDragStart={onSpearClick}
-                 onDragEnd={() => {
-                   board.selectedCell = null;
-                   clearMoves();
-                   board.clearCapturesDisplay();
-                 }}>
+    };
 
-      <img src={`src/images/figures/${spearImage}`} alt=""/>
-    </div>)
-  }
-  else{
-    const cell = getBoardCell(row, col);
-    const [tick, setTick] = useState(0);
-
+    return (
+      <div
+        className="figure"
+        onClick={onSpearClick}
+        draggable
+        onDragStart={onSpearClick}
+        onDragEnd={() => {
+          board.selectedCell = null;
+          clearMoves();
+          board.clearCapturesDisplay();
+        }}
+      >
+        <img src={`src/images/figures/${spearImage}`} alt="Captured Spear" />
+      </div>
+    );
+  } else {
     const onSpearClick = () => {
-      if ((board.currentTurn == "sente" && !cell.displayRotated) ||
-        (board.currentTurn == "gote" && cell.displayRotated)) {
+      if (!cell) return;
 
-        if (!cell.canCapture){
+      if (
+        (board.currentTurn == "sente" && !cell.displayRotated) ||
+        (board.currentTurn == "gote" && cell.displayRotated)
+      ) {
+        if (!cell.canCapture) {
           board.selectedCell = cell;
           board.spearMoveDisplay.displayMoves(cell);
           const movesToDisplay = board.cellsToMoveDisplay;
           displayAvailableMoves(movesToDisplay);
         }
       }
-    }
-
-    useEffect(() => {
-
-    }, [cell]);
-
-    useEffect(() => {
-      const listener = () => {
-        setTick(prevTick => prevTick+1);
-      };
-
-      board.subscribe(listener);
-
-      return () => {
-        board.unsubscribe(listener);
-      }
-    }, [board]);
-
-    const [isPromoted, setIsPromoted] = useState(false);
-
-    useEffect(() => {
-      if (cell.figureOn?.getState().checkPromotion() != undefined) {
-        setIsPromoted(cell.figureOn?.getState().checkPromotion())
-      }
-    }, [isPromoted]);
-
+    };
 
     if (isPromoted) {
       spearImage = "spear_promotion.png";
-    }
-    else {
+    } else {
       spearImage = "spear.png";
     }
 
     return (
-      <div className="figure" onClick={onSpearClick}
-           draggable
-           onDragStart={onSpearClick}
-           onDragEnd={() => {
-             board.selectedCell = null;
-             clearMoves();
-             board.clearCapturesDisplay();
-           }}>
-        <img src={`src/images/figures/${spearImage}`} alt=""/>
+      <div
+        className="figure"
+        onClick={onSpearClick}
+        draggable
+        onDragStart={onSpearClick}
+        onDragEnd={() => {
+          board.selectedCell = null;
+          clearMoves();
+          board.clearCapturesDisplay();
+        }}
+      >
+        <img src={`src/images/figures/${spearImage}`} alt="Spear" />
       </div>
-    )
+    );
   }
 }
 

@@ -1,5 +1,4 @@
 import Figure from "../classes/Figure.ts";
-import {Board} from "../classes/Board.ts";
 import GeneralPromotionDecorator from "../classes/service/decorator/GeneralPromotionDecorator.ts";
 import PawnCreator from "../classes/service/abstractFactory/PawnCreator.ts";
 import HorseCreator from "../classes/service/abstractFactory/HorseCreator.ts";
@@ -8,8 +7,8 @@ import SpearCreator from "../classes/service/abstractFactory/SpearCreator.ts";
 import ElephantCreator from "../classes/service/abstractFactory/ElephantCreator.ts";
 import RookCreator from "../classes/service/abstractFactory/RookCreator.ts";
 import DefaultState from "../classes/service/state/DefaultState.ts";
-import {FigureComponents} from "./CellElement.tsx";
-
+import { FigureComponents } from "./CellElement.tsx";
+import React from "react";
 
 interface CapturedElementProps {
   figure: Figure;
@@ -17,8 +16,11 @@ interface CapturedElementProps {
   setGameStage: (stage: "menu" | "game" | "gameOver") => void;
 }
 
-function CapturedElement({ figure, owner, setGameStage }: CapturedElementProps) {
-  let figureElement = null;
+function CapturedElement({
+  figure,
+  owner,
+  setGameStage,
+}: CapturedElementProps) {
   const pawnCreator = new PawnCreator();
   const horseCreator = new HorseCreator();
   const silverGeneralCreator = new SilverGeneralCreator();
@@ -26,61 +28,97 @@ function CapturedElement({ figure, owner, setGameStage }: CapturedElementProps) 
   const elephantCreator = new ElephantCreator();
   const rookCreator = new RookCreator();
 
-  if (figure == undefined) {
-    return;
+  if (!figure) {
+    return null;
   }
 
-  const mediator = figure?.mediator;
-  const row = figure?.getRow()
-  const col = figure?.getCol()
+  // @ts-expect-error: Навмисний доступ до protected властивості для фабрики
+  const mediator = figure.mediator;
 
+  const row = figure?.getRow();
+  const col = figure?.getCol();
 
   let name = figure?.constructor.name;
-  if (name === "GeneralPromotionDecorator") {
-    const decorateCell: GeneralPromotionDecorator = figure;
 
+  if (name === "GeneralPromotionDecorator") {
+    const decorateCell = figure as GeneralPromotionDecorator;
+
+    // @ts-expect-error: Навмисний доступ до protected властивості декоратора
     const figureName = decorateCell.figure.constructor.name;
 
-    console.log(figureName);
     switch (figureName) {
       case "Pawn":
         name = "Pawn";
-        figure = pawnCreator.createFigure(mediator, row, col, new DefaultState())
+        figure = pawnCreator.createFigure(
+          mediator,
+          row,
+          col,
+          new DefaultState(),
+        );
         break;
       case "Horse":
         name = "Horse";
-        figure = horseCreator.createFigure(mediator, row, col, new DefaultState())
+        figure = horseCreator.createFigure(
+          mediator,
+          row,
+          col,
+          new DefaultState(),
+        );
         break;
       case "SilverGeneral":
         name = "SilverGeneral";
-        figure = silverGeneralCreator.createFigure(mediator, row, col, new DefaultState())
+        figure = silverGeneralCreator.createFigure(
+          mediator,
+          row,
+          col,
+          new DefaultState(),
+        );
         break;
       case "Spear":
         name = "Spear";
-        figure = spearCreator.createFigure(mediator, row, col, new DefaultState())
+        figure = spearCreator.createFigure(
+          mediator,
+          row,
+          col,
+          new DefaultState(),
+        );
         break;
     }
-  } else if (figure?.constructor.name === "ElephantPromotionDecorator") {
+  } else if (name === "ElephantPromotionDecorator") {
     name = "Elephant";
-    figure = elephantCreator.createFigure(mediator, row, col, new DefaultState())
-  } else if (figure?.constructor.name === "RookPromotionDecorator") {
+    figure = elephantCreator.createFigure(
+      mediator,
+      row,
+      col,
+      new DefaultState(),
+    );
+  } else if (name === "RookPromotionDecorator") {
     name = "Rook";
-    figure = rookCreator.createFigure(mediator, row, col, new DefaultState())
+    figure = rookCreator.createFigure(mediator, row, col, new DefaultState());
   }
 
+  // Приводимо до React.ElementType, щоб TS дозволив передавати будь-які пропси,
+  // оскільки різні фігури мають різні інтерфейси пропсів
+  const FigureComponent = FigureComponents[
+    name as keyof typeof FigureComponents
+  ] as React.ElementType;
 
-  const checkRotation = owner != "sente" ? false : true;
-
-  const FigureComponent = FigureComponents[name];
-  figureElement = <FigureComponent rotated={checkRotation} row={row} col={col}
-                                   isCaptured={true} figure={figure} owner={owner}
-                                    setGameStage={setGameStage}/>;
+  if (!FigureComponent) {
+    return null;
+  }
 
   return (
     <div className="captured-figure">
-      {figureElement}
+      <FigureComponent
+        row={row}
+        col={col}
+        isCaptured={true}
+        figure={figure}
+        owner={owner}
+        setGameStage={setGameStage}
+      />
     </div>
-  )
+  );
 }
 
 export default CapturedElement;

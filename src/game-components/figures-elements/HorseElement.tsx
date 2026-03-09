@@ -1,5 +1,5 @@
-import {Board, useBoard} from "../../classes/Board.ts";
-import {useEffect, useState} from "react";
+import { Board, useBoard } from "../../classes/Board.ts";
+import { useEffect, useState } from "react";
 import Figure from "../../classes/Figure.ts";
 
 interface HorseElementProps {
@@ -10,42 +10,78 @@ interface HorseElementProps {
   owner: string;
 }
 
-function HorseElement({ row, col, isCaptured, figure, owner }: HorseElementProps) {
-  const {getBoardCell, displayAvailableMoves, clearMoves} = useBoard();
+function HorseElement({
+  row,
+  col,
+  isCaptured,
+  figure,
+  owner,
+}: HorseElementProps) {
+  const { getBoardCell, displayAvailableMoves, clearMoves } = useBoard();
   const board = Board.instance;
-  let horseImage : string;
+  const [, setTick] = useState(0);
+  const [isPromoted, setIsPromoted] = useState(false);
 
-  if(isCaptured) {
+  const cell = isCaptured ? null : getBoardCell(row, col);
+
+  useEffect(() => {}, [cell]);
+
+  useEffect(() => {
+    if (isCaptured) return;
+
+    const listener = () => {
+      setTick((prevTick) => prevTick + 1);
+    };
+
+    board.subscribe(listener);
+
+    return () => {
+      board.unsubscribe(listener);
+    };
+  }, [board, isCaptured]);
+
+  useEffect(() => {
+    if (cell && cell.figureOn?.getState().checkPromotion() != undefined) {
+      setIsPromoted(!!cell.figureOn?.getState().checkPromotion());
+    }
+  }, [cell]);
+
+  let horseImage: string;
+
+  if (isCaptured) {
     horseImage = "horse.png";
     const onHorseClick = () => {
-
       if (owner === board.currentTurn) {
         board.selectCapturedFigure(figure);
         board.horseMoveDisplay.displayDropIn(figure);
-        const movesToDisplay = board.cellsToMoveDisplay; //change
+        const movesToDisplay = board.cellsToMoveDisplay;
         displayAvailableMoves(movesToDisplay);
       }
-    }
-    return (<div className="figure" onClick={onHorseClick}
-                 draggable
-                 onDragStart={onHorseClick}
-                 onDragEnd={() => {
-                   board.selectedCell = null;
-                   clearMoves();
-                   board.clearCapturesDisplay();
-                 }}>
+    };
 
-      <img src={`src/images/figures/${horseImage}`} alt=""/>
-    </div>)
-  }
-  else {
-    const cell = getBoardCell(row, col);
-    const [tick, setTick] = useState(0);
-
+    return (
+      <div
+        className="figure"
+        onClick={onHorseClick}
+        draggable
+        onDragStart={onHorseClick}
+        onDragEnd={() => {
+          board.selectedCell = null;
+          clearMoves();
+          board.clearCapturesDisplay();
+        }}
+      >
+        <img src={`src/images/figures/${horseImage}`} alt="" />
+      </div>
+    );
+  } else {
     const onHorseClick = () => {
-      if ((board.currentTurn == "sente" && !cell.displayRotated) ||
-        (board.currentTurn == "gote" && cell.displayRotated)) {
+      if (!cell) return;
 
+      if (
+        (board.currentTurn == "sente" && !cell.displayRotated) ||
+        (board.currentTurn == "gote" && cell.displayRotated)
+      ) {
         if (!cell.canCapture) {
           board.selectedCell = cell;
           board.horseMoveDisplay.displayMoves(cell);
@@ -53,52 +89,29 @@ function HorseElement({ row, col, isCaptured, figure, owner }: HorseElementProps
           displayAvailableMoves(movesToDisplay);
         }
       }
-    }
-
-    useEffect(() => {
-
-    }, [cell]);
-
-    useEffect(() => {
-      const listener = () => {
-        setTick(prevTick => prevTick+1);
-      };
-
-      board.subscribe(listener);
-
-      return () => {
-        board.unsubscribe(listener);
-      }
-    }, [board]);
-
-
-    const [isPromoted, setIsPromoted] = useState(false);
-
-    useEffect(() => {
-      if (cell.figureOn?.getState().checkPromotion() != undefined) {
-        setIsPromoted(cell.figureOn?.getState().checkPromotion())
-      }
-    }, [isPromoted]);
-
+    };
 
     if (isPromoted) {
       horseImage = "horse_promotion.png";
-    }
-    else {
+    } else {
       horseImage = "horse.png";
     }
+
     return (
-      <div className="figure" onClick={onHorseClick}
-           draggable
-           onDragStart={onHorseClick}
-           onDragEnd={() => {
-             board.selectedCell = null;
-             clearMoves();
-             board.clearCapturesDisplay();
-           }}>
-        <img src={`src/images/figures/${horseImage}`} alt=""/>
+      <div
+        className="figure"
+        onClick={onHorseClick}
+        draggable
+        onDragStart={onHorseClick}
+        onDragEnd={() => {
+          board.selectedCell = null;
+          clearMoves();
+          board.clearCapturesDisplay();
+        }}
+      >
+        <img src={`src/images/figures/${horseImage}`} alt="" />
       </div>
-    )
+    );
   }
 }
 

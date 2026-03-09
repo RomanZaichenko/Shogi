@@ -7,16 +7,13 @@ class LoadStatsCommand implements StorageCommand {
   };
 
   private setLoses: (loses:number, board: Board) => void = (num: number, board: Board) => {
-
     board.losesCounter = num;
   };
 
-
-
   execute() {
-    const wins = parseInt(localStorage.getItem("wins"), 10);
-    const loses = parseInt(localStorage.getItem("loses"), 10);
-    const board = Board.instance
+    const wins = parseInt(localStorage.getItem("wins") || "0", 10) || 0;
+    const loses = parseInt(localStorage.getItem("loses") || "0", 10) || 0;
+    const board = Board.instance;
 
     this.setWins(wins, board);
     this.setLoses(loses, board);

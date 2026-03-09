@@ -4,10 +4,6 @@ import {Board} from "../../Board.ts";
 
 class RookPromotionDecorator extends FigurePromotionDecorator {
   checkAvailableCells(): Cell[] {
-    // const availableCells = super.checkAvailableCells();
-
-    //TODO use super.checkAvailableCells for checking default moves
-
     const board = Board.instance;
     const row = this.figureCoordinates.row;
     const col = this.figureCoordinates.col;

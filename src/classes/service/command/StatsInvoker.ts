@@ -1,7 +1,7 @@
 import StorageCommand from "./StorageCommand.ts";
 
 class StatsInvoker {
-  private statsCommand: StorageCommand;
+  private statsCommand!: StorageCommand;
 
   setCommand(command: StorageCommand): void {
     this.statsCommand = command;
